@@ -4,10 +4,10 @@
 //  cd .kanbn/tasks && node generate.js 10 (go to the tasks folder and generate 10 tasks)
 //  cd ../ && kanbn add -u (add all untracked tasks to the index)
 
-const fs = require("fs");
-const faker = require("faker");
-const parseTask = require("../src/parse-task");
-const utility = require("../src/utility");
+import fs from 'fs';
+import faker from 'faker';
+import parseTask from '../src/parse-task.js';
+import utility from '../src/utility.js';
 
 let N;
 if (process.argv.length > 2) {

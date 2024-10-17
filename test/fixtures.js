@@ -1,8 +1,8 @@
-const mockFileSystem = require('mock-fs');
-const faker = require('faker');
-const parseIndex = require('../src/parse-index');
-const parseTask = require('../src/parse-task');
-const utility = require('../src/utility');
+import mockFileSystem from 'mock-fs';
+import faker from 'faker';
+import parseIndex from '../src/parse-index.js';
+import parseTask from '../src/parse-task.js';
+import utility from '../src/utility.js';
 
 /**
  * Generate a random task
@@ -70,7 +70,7 @@ function addRelations(taskIds) {
  * Generate an index and tasks
  * @param {fixtureOptions} [options={}]
  */
-module.exports = (options = {}) => {
+export default (options = {}) => {
   let tasks, taskIds, columns;
 
   // Generate tasks

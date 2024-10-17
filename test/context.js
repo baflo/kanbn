@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const parseIndex = require('../src/parse-index');
-const parseTask = require('../src/parse-task');
-const mockStdIn = require('mock-stdin').stdin();
+import fs from 'fs';
+import path from 'path';
+import parseIndex from '../src/parse-index.js';
+import parseTask from '../src/parse-task.js';
+import { stdin() as mockStdIn } from 'mock-stdin';
 
 function loadIndex(basePath) {
   return parseIndex.md2json(fs.readFileSync(path.join(basePath, 'index.md'), { encoding: 'utf-8' }));
@@ -12,7 +12,7 @@ function loadTask(basePath, taskId) {
   return parseTask.md2json(fs.readFileSync(path.join(basePath, 'tasks', `${taskId}.md`), { encoding: 'utf-8' }));
 }
 
-module.exports = {
+export default {
 
   keys: {
     up: '\x1B\x5B\x41',

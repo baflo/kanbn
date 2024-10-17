@@ -1,4 +1,4 @@
-module.exports = (() => {
+export default (() => {
   const tags = {
     b: 'bold',
     d: 'dim'

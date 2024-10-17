@@ -1,9 +1,10 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
+import inquirerRecursive from 'inquirer-recursive';
 
-inquirer.registerPrompt('recursive', require('inquirer-recursive'));
+inquirer.registerPrompt('recursive', inquirerRecursive);
 
 const sorterFields = [
   {
@@ -258,7 +259,7 @@ function sortColumn(columnName, sorters, save) {
   });
 }
 
-module.exports = async (args, argv) => {
+export default async (args, argv) => {
 
   // Sortable fields and aliases
   const sortOptions = Object.fromEntries(utility.zip(

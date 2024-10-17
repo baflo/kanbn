@@ -86,4 +86,4 @@ const kanbn = {
   }
 };
 
-module.exports = { config, kanbn };
+export default { config, kanbn };

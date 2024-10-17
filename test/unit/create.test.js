@@ -1,8 +1,8 @@
-const mockFileSystem = require('mock-fs');
-const fs = require('fs');
-const path = require('path');
-const kanbn = require('../../src/main');
-const context = require('../context');
+import mockFileSystem from 'mock-fs';
+import fs from 'fs';
+import path from 'path';
+import kanbn from '../../src/main.js';
+import context from '../context.js';
 
 QUnit.module('createTask tests', {
   before() {

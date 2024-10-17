@@ -1,6 +1,6 @@
-const mockArgv = require('mock-argv');
-const captureConsole = require('capture-console');
-const kanbn = require('../../index');
+import mockArgv from 'mock-argv';
+import captureConsole from 'capture-console';
+import kanbn from '../../index.js';
 
 QUnit.module('version controller tests', {
   before() {

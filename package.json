@@ -2,7 +2,8 @@
   "name": "@basementuniverse/kanbn",
   "version": "0.10.0",
   "description": "A CLI Kanban application",
-  "main": "index.js",
+  "type": "module",
+  "exports": "./index.js",
   "scripts": {
     "test": "KANBN_ENV=test qunit ./test/**/*.test.js"
   },

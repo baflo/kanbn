@@ -1,9 +1,10 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
+import inquirerRecursive from 'inquirer-recursive';
 
-inquirer.registerPrompt('recursive', require('inquirer-recursive'));
+inquirer.registerPrompt('recursive', inquirerRecursive);
 
 /**
  * Initialise kanbn interactively
@@ -89,7 +90,7 @@ async function initialise(options, initialised) {
   });
 }
 
-module.exports = async args => {
+export default async args => {
   let options = {};
 
   // If this folder is already initialised, set the default name and description using the current values

@@ -1,12 +1,12 @@
-const fs = require("fs");
-const path = require("path");
-const glob = require("glob-promise");
-const parseIndex = require("./parse-index");
-const parseTask = require("./parse-task");
-const utility = require("./utility");
-const yaml = require("yamljs");
-const humanizeDuration = require("humanize-duration");
-const rimraf = require("rimraf");
+import fs from 'fs';
+import path from 'path';
+import glob from 'glob-promise';
+import parseIndex from './parse-index.js';
+import parseTask from './parse-task.js';
+import utility from './utility.js';
+import yaml from 'yamljs';
+import humanizeDuration from 'humanize-duration';
+import rimraf from 'rimraf';
 
 const DEFAULT_FOLDER_NAME = ".kanbn";
 const DEFAULT_INDEX_FILE_NAME = "index.md";
@@ -2366,4 +2366,4 @@ class Kanbn {
   }
 };
 
-module.exports.Kanbn = Kanbn
+export { Kanbn }

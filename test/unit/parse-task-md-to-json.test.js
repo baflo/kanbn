@@ -1,4 +1,4 @@
-const parseTask = require('../../src/parse-task');
+import parseTask from '../../src/parse-task.js';
 
 QUnit.module('Task markdown to JSON conversion tests');
 

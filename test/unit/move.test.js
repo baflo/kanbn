@@ -1,7 +1,7 @@
-const mockFileSystem = require('mock-fs');
-const kanbn = require('../../src/main');
-const context = require('../context');
-const mockDate = require('mockdate');
+import mockFileSystem from 'mock-fs';
+import kanbn from '../../src/main.js';
+import context from '../context.js';
+import mockDate from 'mockdate';
 
 QUnit.module('moveTask tests', {
   before() {

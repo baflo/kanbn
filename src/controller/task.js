@@ -1,8 +1,8 @@
-const kanbn = require("../main");
-const utility = require("../utility");
-const parseTask = require("../parse-task");
-const marked = require("marked");
-const markedTerminalRenderer = require("marked-terminal");
+import kanbn from '../main.js';
+import utility from '../utility.js';
+import parseTask from '../parse-task.js';
+import marked from 'marked';
+import markedTerminalRenderer from 'marked-terminal';
 
 /**
  * Show task information
@@ -26,7 +26,7 @@ function showTask(taskId, json = false) {
     });
 }
 
-module.exports = async (args) => {
+export default async (args) => {
   // Make sure kanbn has been initialised
   if (!(await kanbn.initialised())) {
     utility.error("Kanbn has not been initialised in this folder\nTry running: {b}kanbn init{b}");

@@ -1,6 +1,6 @@
-const mockFileSystem = require('mock-fs');
-const kanbn = require('../../src/main');
-const context = require('../context');
+import mockFileSystem from 'mock-fs';
+import kanbn from '../../src/main.js';
+import context from '../context.js';
 
 QUnit.module('addUntrackedTaskToIndex tests', {
   before() {

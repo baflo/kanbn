@@ -1,4 +1,4 @@
-const stripAnsi = require('strip-ansi');
+import stripAnsi from 'strip-ansi';
 
 /**
  * Check if an array contains a matching string

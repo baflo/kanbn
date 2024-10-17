@@ -1,10 +1,10 @@
-const mockRequire = require('mock-require');
-const mockArgv = require('mock-argv');
-const captureConsole = require('capture-console');
-const {
-  config: mockConfig,
-  kanbn: mockKanbn
-} = require('../mock-kanbn');
+import mockRequire from 'mock-require';
+import mockArgv from 'mock-argv';
+import captureConsole from 'capture-console';
+import {
+  config as mockConfig,
+  kanbn as mockKanbn
+} from '../mock-kanbn.js';
 
 let kanbn;
 

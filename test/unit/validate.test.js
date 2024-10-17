@@ -1,7 +1,7 @@
-const mockFileSystem = require('mock-fs');
-const fs = require('fs');
-const path = require('path');
-const kanbn = require('../../src/main');
+import mockFileSystem from 'mock-fs';
+import fs from 'fs';
+import path from 'path';
+import kanbn from '../../src/main.js';
 
 QUnit.module('validate tests', {
   before() {

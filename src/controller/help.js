@@ -1,10 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const utility = require('../utility');
+import fs from 'fs';
+import path from 'path';
+import utility from '../utility.js';
 
-module.exports = async (args, argv, routeId) => {
-  const helpRoute = require(path.join(__dirname, '../../routes', `${routeId}.json`));
-  fs.promises.readFile(path.join(__dirname, '../../', helpRoute.help), { encoding: 'utf-8' }).then(help => {
+export default async (args, argv, routeId) => {
+  const helpRoute = await import(path.join(import.meta.dirname, '../../routes', `${routeId}.json`));
+  fs.promises.readFile(path.join(import.meta.dirname, '../../', helpRoute.help), { encoding: 'utf-8' }).then(help => {
     console.log(utility.replaceTags(help).trim());
   });
 };

@@ -1,4 +1,4 @@
-module.exports = function parseMarkdown(markdown) {
+export default function parseMarkdown(markdown) {
   if (!markdown) {
     throw new Error('data is null, undefined or empty');
   }

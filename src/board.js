@@ -1,9 +1,9 @@
-const kanbn = require('./main');
-const term = require('terminal-kit').terminal;
-const formatDate = require('dateformat');
-const utility = require('./utility');
+import kanbn from './main.js';
+import formatDate from 'dateformat';
+import utility from './utility.js';
+import { terminal as term } from 'terminal-kit';
 
-module.exports = (() => {
+export default (() => {
   const TASK_SEPARATOR = '\n\n';
 
   /**

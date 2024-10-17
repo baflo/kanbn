@@ -1,8 +1,9 @@
-const yaml = require('yamljs');
-const fm = require('front-matter');
-const marked = require('marked');
-const validate = require('jsonschema').validate;
-const parseMarkdown = require('./parse-markdown');
+import yaml from 'yamljs';
+import fm from 'front-matter';
+import marked from 'marked';
+import { validate as validate } from 'jsonschema';
+import parseMarkdown from './parse-markdown.js';
+import { remark } from 'remark';
 
 /**
  * Validate the options object
@@ -173,7 +174,7 @@ function validateColumns(columns) {
   }
 }
 
-module.exports = {
+export default {
 
   /**
    * Convert markdown into an index object
@@ -239,6 +240,9 @@ module.exports = {
 
       // Parse columns
       const columnNames = Object.keys(index).filter(column => ['raw', 'Options', name].indexOf(column) === -1);
+      console.log("-------------------");
+      console.log(index["Todo"].content)
+      console.log("-------------------");
       if (columnNames.length) {
         columns = Object.fromEntries(columnNames.map(columnName => {
           try {

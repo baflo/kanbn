@@ -1,9 +1,11 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
 
-inquirer.registerPrompt('selectLine', require('inquirer-select-line'));
+import inquirerSelectLine from 'inquirer-select-line';
+
+inquirer.registerPrompt('selectLine', inquirerSelectLine);
 
 /**
  * Move a task interactively
@@ -54,7 +56,7 @@ function moveTask(taskId, columnName, position = null, relative = false) {
   });
 }
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

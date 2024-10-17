@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require('..')()
+import index from '../index.js'
+
+index()

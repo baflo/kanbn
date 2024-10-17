@@ -1,5 +1,5 @@
-const { version } = require('../../package.json');
+import { version } from '../../package.json.js';
 
-module.exports = args => {
+export default args => {
   console.log(`v${version}`);
 };

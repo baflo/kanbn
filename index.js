@@ -1,17 +1,18 @@
 import minimist from 'minimist';
 import path from 'path';
-import utility from './src/utility.js';
 import dotenv from 'dotenv';
 import autoload from 'auto-load';
 
+const dirname = typeof __dirname !== "undefined" ? __dirname : import.meta.dirname;
+
 export default async () => {
-  dotenv.config({ path: path.join(import.meta.dirname, '.env') });
+  dotenv.config({ path: path.join(dirname, '.env') });
 
   // Get the command
   const command = process.argv[2] || '';
 
   // Load route configs and get the current route
-  const routes = autoload(path.join(import.meta.dirname, 'routes')), route = {};
+  const routes = autoload(path.join(dirname, 'routes')), route = {};
   const found = Object.entries(routes).find(([id, route]) => route.commands.indexOf(command) !== -1);
 
   // Make sure we have a valid route

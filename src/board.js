@@ -1,7 +1,8 @@
 import kanbn from './main.js';
 import formatDate from 'dateformat';
 import utility from './utility.js';
-import { terminal as term } from 'terminal-kit';
+import terminalKit from 'terminal-kit';
+const { terminal: term } = terminalKit;
 
 export default (() => {
   const TASK_SEPARATOR = '\n\n';

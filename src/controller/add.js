@@ -1,9 +1,8 @@
-import { Kanbn } from '../main.js';
-const kanbn = new Kanbn();
+import kanbn from '../main.js';
 import utility from '../utility.js';
 import inquirer from 'inquirer';
 import fuzzy from 'fuzzy';
-import chrono from 'chrono-node';
+import * as chrono from 'chrono-node';
 import getGitUsername from 'git-user-name';
 import inquirerDatepicker from 'inquirer-datepicker';
 import inquirerRecursive from 'inquirer-recursive';

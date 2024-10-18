@@ -2375,3 +2375,4 @@ class Kanbn {
 };
 
 export { Kanbn }
+export default new Kanbn();

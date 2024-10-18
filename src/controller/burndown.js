@@ -1,10 +1,10 @@
-import kanbn_module from '../main.js';
-const kanbn = new kanbn_module.Kanbn();
+import kanbn from '../main.js';
 import utility from '../utility.js';
 import asciichart from 'asciichart';
-import { terminal as term } from 'terminal-kit';
-import chrono from 'chrono-node';
+import * as chrono from 'chrono-node';
 import formatDate from 'dateformat';
+import terminalKit from 'terminal-kit';
+const { terminal: term } = terminalKit;
 
 export default async args => {
 
@@ -76,6 +76,7 @@ export default async args => {
       const width = term.width - (PADDING.length + 1);
 
       const plots = [];
+      let s;
       for (s of data.series) {
         const plot = [], delta = Math.floor((s.to.getTime() - s.from.getTime()) / width);
         for (let i = 0; i < width; i++) {

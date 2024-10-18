@@ -3,7 +3,10 @@ import fm from 'front-matter';
 import marked from 'marked';
 import { validate as validate } from 'jsonschema';
 import parseMarkdown from './parse-markdown.js';
-import { remark } from 'remark';
+import { unified } from 'unified';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse'
+import remarkStringify from 'remark-stringify'
 
 /**
  * Validate the options object
@@ -182,27 +185,25 @@ export default {
    * @return {object}
    */
   md2json(data) {
-    let name = '', description = '', options = {}, columns = {};
+    let options = {};
+    // Check data type
+    ({ options, data } = initializeIndexData(data, options));
+
+    if (options.indexVersion === 2) {
+      return this.md2json_v2(data, options);
+    } else {
+      return this.md2json_v1(data, options);
+    }
+  },
+
+  /**
+   * Convert markdown into an index object
+   * @param {string} data
+   * @return {object}
+   */
+  md2json_v1(data, options) {
+    let name = '', description = '', columns = {};
     try {
-
-      // Check data type
-      if (!data) {
-        throw new Error('data is null or empty');
-      }
-      if (typeof data !== 'string') {
-        throw new Error('data is not a string');
-      }
-
-      // Get YAML front matter if any exists
-      if (fm.test(data)) {
-        ({ attributes: options, body: data } = fm(data));
-
-        // Make sure the front matter contains an object
-        if (typeof options !== 'object') {
-          throw new Error('invalid front matter content');
-        }
-      }
-
       // Parse markdown to an object
       let index = null;
       try {
@@ -240,9 +241,6 @@ export default {
 
       // Parse columns
       const columnNames = Object.keys(index).filter(column => ['raw', 'Options', name].indexOf(column) === -1);
-      console.log("-------------------");
-      console.log(index["Todo"].content)
-      console.log("-------------------");
       if (columnNames.length) {
         columns = Object.fromEntries(columnNames.map(columnName => {
           try {
@@ -264,6 +262,54 @@ export default {
     // Assemble index object
     return { name, description, options, columns };
   },
+  
+  /**
+   * Convert markdown into an index object
+   * @param {string} data
+   * @return {object}
+   */
+  md2json_v2(data, options) {
+    let name = '', description = '', columns = {};
+    try {
+      // Parse markdown to an object
+      let index = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkStringify)
+        .parse(data, { entities: 'escape' });
+
+      // Get name and descriptions
+      const headingIndex = index.children.findIndex(child => child.type === "heading" && child.depth === 1);
+      name = index.children[headingIndex].children[0].value;
+      description = index.children[headingIndex + 1].children[0].value;
+
+      validateOptions(options);
+
+      // Parse columns
+      const [ headings, ...rows ] = index.children.find(child => child.type === "table").children;
+      const columnNames = headings.children.map(column => column.children[0].value);
+      if (columnNames.length) {
+        columns = Object.fromEntries(columnNames.map((columnName, columnIndex) => {
+          try {
+            return [
+              columnName,
+              rows.flatMap(r => r.children[columnIndex].children.map(task => task.children[0].value))
+            ];
+            
+          } catch (error) {
+            console.log(error)
+            throw new Error(`column "${columnName}" must contain a list`);
+          }
+        }));
+      }
+    } catch (error) {
+      console.log(error)
+      throw new Error(`Unable to parse index: ${error.message}`);
+    }
+
+    // Assemble index object
+    return { name, description, options, columns };
+  },
 
   /**
    * Convert an index object into markdown
@@ -272,37 +318,9 @@ export default {
    * @return {string}
    */
   json2md(data, ignoreOptions = false) {
-    const result = [];
+    let result;
     try {
-
-      // Check data type
-      if (!data) {
-        throw new Error('data is null or empty');
-      }
-      if (typeof data !== 'object') {
-        throw new Error('data is not an object');
-      }
-
-      // Check required fields
-      if (!('name' in data)) {
-        throw new Error('data object is missing name');
-      }
-
-      // Add options as front-matter content if present and not ignoring
-      if ('options' in data && data.options !== null && !ignoreOptions) {
-        validateOptions(data.options);
-        if (Object.keys(data.options).length) {
-          result.push(
-            `---\n${yaml.stringify(data.options, 4, 2).trim()}\n---`
-          );
-        }
-      }
-
-      // Add name and description
-      result.push(`# ${data.name}`);
-      if ('description' in data) {
-        result.push(data.description);
-      }
+      result = this.initializeIndexFile(data, ignoreOptions);
 
       // Check columns
       if (!('columns' in data)) {
@@ -323,5 +341,114 @@ export default {
 
     // Filter empty lines and join into a string
     return `${result.filter(l => !!l).join('\n\n')}\n`;
+  },
+
+
+  /**
+   * Convert an index object into markdown
+   * @param {object} data
+   * @param {boolean} [ignoreOptions=false]
+   * @return {string}
+   */
+  json2md_v2(data, ignoreOptions = false) {
+    const result = this.initializeIndexFile(data, ignoreOptions);
+
+    const table = {
+      type: "table",
+      children: []
+    }
+
+    // Add columns
+    table.children.push({
+      type: "tableRow",
+      children: Object.keys(data.columns).map(value => ({
+        type: "tableCell",
+        children: [{ type: "text", value }]
+      }))
+    })
+
+    for (let i = 0; i < Math.max(...Object.values(data.columns).map(c => c.length)); i++) {        
+      table.children.push({
+        type: "tableRow",
+        children: Object.values(data.columns)
+          .map(c => c[i] 
+            ? {
+               type: "link",
+               url: `tasks/${c[i]}.md`,
+               children: [{ type: "text", value: c[i] }],
+              }
+            : undefined
+          )
+          .filter(c => c)
+          .map(value => ({
+            type: "tableCell",
+            children: [value]
+          }))
+      })
+    }
+
+    const strigifiedTable = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkStringify)
+      .stringify(table, { entities: 'escape' });
+
+    return  `${result.filter(l => !!l).join('\n\n')}\n\n${strigifiedTable}\n` 
+  },
+
+  initializeIndexFile(data, ignoreOptions) {
+    const result = []
+
+    // Check data type
+    if (!data) {
+      throw new Error('data is null or empty');
+    }
+    if (typeof data !== 'object') {
+      throw new Error('data is not an object');
+    }
+
+    // Check required fields
+    if (!('name' in data)) {
+      throw new Error('data object is missing name');
+    }
+
+    // Add options as front-matter content if present and not ignoring
+    if ('options' in data && data.options !== null && !ignoreOptions) {
+      validateOptions(data.options);
+      if (Object.keys(data.options).length) {
+        result.push(
+          `---\n${yaml.stringify(data.options, 4, 2).trim()}\n---`
+        );
+      }
+    }
+
+    // Add name and description
+    result.push(`# ${data.name}`);
+    if ('description' in data) {
+      result.push(data.description);
+    }
+
+    return result;
   }
 };
+function initializeIndexData(data, options) {
+  if (!data) {
+    throw new Error('data is null or empty');
+  }
+  if (typeof data !== 'string') {
+    throw new Error('data is not a string');
+  }
+
+  // Get YAML front matter if any exists
+  if (fm.test(data)) {
+    ({ attributes: options, body: data } = fm(data));
+
+    // Make sure the front matter contains an object
+    if (typeof options !== 'object') {
+      throw new Error('invalid front matter content');
+    }
+  }
+
+  return { options, data };
+}
+

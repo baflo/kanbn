@@ -680,6 +680,23 @@ class Kanbn {
     return index;
   }
   /**
+   * Add tags of task to list of suggested tags if activated
+   * @param {object} indexData Index data to save
+   * @param {object} taskData The task data
+   */
+  async addTagsToSuggestion(indexData, taskData) {
+    if (!indexData.options.suggestedTags?.saveNewTags) return;
+    const currentSuggestedTags = indexData.options.suggestedTags?.tags ?? [];
+    const neverSuggestedTags = indexData.options.suggestedTags?.ignored ?? [];
+    const taskTags = taskData.metadata.tags ?? [];
+    const newSuggestedTags = [...currentSuggestedTags, ...taskTags].filter((curr, index, arr) => arr.indexOf(curr) === index).filter((curr) => !neverSuggestedTags.includes(curr)).sort();
+    indexData.options.suggestedTags = {
+      saveNewTags: !!indexData.options.suggestedTags?.saveNewTags,
+      ignored: neverSuggestedTags,
+      tags: newSuggestedTags
+    };
+  }
+  /**
    * Overwrite a task file with the specified data
    * @param {string} path The task path
    * @param {object} taskData The task data
@@ -856,6 +873,7 @@ class Kanbn {
     taskData = setTaskMetadata(taskData, "created", /* @__PURE__ */ new Date());
     taskData = updateColumnLinkedCustomFields(index, taskData, columnName);
     await this.saveTask(taskPath, taskData);
+    this.addTagsToSuggestion(index, taskData);
     index = addTaskToIndex(index, taskId, columnName);
     await this.saveIndex(index);
     return taskId;
@@ -885,6 +903,7 @@ class Kanbn {
     const taskPath = getTaskPath(await this.getTaskFolderPath(), taskId);
     taskData = updateColumnLinkedCustomFields(index, taskData, columnName);
     await this.saveTask(taskPath, taskData);
+    this.addTagsToSuggestion(index, taskData);
     index = addTaskToIndex(index, taskId, columnName);
     await this.saveIndex(index);
     return taskId;
@@ -947,6 +966,7 @@ class Kanbn {
     }
     taskData = setTaskMetadata(taskData, "updated", /* @__PURE__ */ new Date());
     await this.saveTask(getTaskPath(await this.getTaskFolderPath(), taskId), taskData);
+    this.addTagsToSuggestion(index, taskData);
     if (columnName) {
       await this.moveTask(taskId, columnName);
     } else {
@@ -1024,6 +1044,7 @@ class Kanbn {
       }
       position = Math.max(Math.min(position, index.columns[currentColumnName].length), 0);
     }
+    this.addTagsToSuggestion(index, taskData);
     index = removeTaskFromIndex(index, taskId);
     index = addTaskToIndex(index, taskId, columnName, position);
     await this.saveIndex(index);

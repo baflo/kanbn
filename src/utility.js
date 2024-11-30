@@ -42,7 +42,7 @@ export default (() => {
      * @param {string} name The task name
      * @return {string} The task id
      */
-     getTaskId(name) {
+    getTaskId(name) {
       return this.paramCase(name);
     },
 
@@ -87,8 +87,8 @@ export default (() => {
      */
     compareDates(a, b) {
       const aDate = new Date(a), bDate = new Date(b);
-      aDate.setHours(0, 0, 0, 0);
-      bDate.setHours(0, 0, 0, 0);
+      aDate.setUTCHours(0, 0, 0, 0);
+      bDate.setUTCHours(0, 0, 0, 0);
       return aDate.getTime() == bDate.getTime();
     },
 

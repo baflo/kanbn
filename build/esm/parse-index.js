@@ -1,6 +1,6 @@
 import yaml from "yamljs";
 import fm from "front-matter";
-import marked from "marked";
+import { marked } from "marked";
 import { validate } from "jsonschema";
 import parseMarkdown from "./parse-markdown.js";
 import { unified } from "unified";

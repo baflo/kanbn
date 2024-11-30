@@ -383,7 +383,7 @@ function normaliseDate(date, resolution = "minutes") {
   const result = new Date(date.getTime());
   switch (resolution) {
     case "days":
-      result.setHours(0);
+      result.setUTCHours(0);
     case "hours":
       result.setMinutes(0);
     case "minutes":
@@ -1251,9 +1251,9 @@ class Kanbn {
         result.period = {};
         if (dates.length === 1) {
           periodStart = /* @__PURE__ */ new Date(+dates[0]);
-          periodStart.setHours(0, 0, 0, 0);
+          periodStart.setUTCHours(0, 0, 0, 0);
           periodEnd = /* @__PURE__ */ new Date(+dates[0]);
-          periodEnd.setHours(23, 59, 59, 999);
+          periodEnd.setUTCHours(23, 59, 59, 999);
           result.period.start = periodStart;
           result.period.end = periodEnd;
         } else {

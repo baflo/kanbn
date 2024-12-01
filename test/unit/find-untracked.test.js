@@ -1,5 +1,5 @@
-const mockFileSystem = require('mock-fs');
-const kanbn = require('../../src/main');
+import mockFileSystem from 'mock-fs';
+import kanbn from '../../src/main.js';
 
 QUnit.module('findUntrackedTasks tests', {
   before() {

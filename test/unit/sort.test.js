@@ -1,6 +1,6 @@
-const mockFileSystem = require('mock-fs');
-const kanbn = require('../../src/main');
-const fixtures = require('../fixtures');
+import mockFileSystem from 'mock-fs';
+import kanbn from '../../src/main.js';
+import fixtures from '../fixtures.js';
 
 QUnit.module('sort tests', {
   before() {

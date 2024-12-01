@@ -1,4 +1,4 @@
-const parseMarkdown = require('../../src/parse-markdown.js');
+import parseMarkdown from '../../src/parse-markdown.js.js';
 
 QUnit.module('General markdown to JSON conversion tests');
 

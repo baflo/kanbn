@@ -97,8 +97,8 @@ var utility_default = /* @__PURE__ */ (() => {
      */
     compareDates(a, b) {
       const aDate = new Date(a), bDate = new Date(b);
-      aDate.setHours(0, 0, 0, 0);
-      bDate.setHours(0, 0, 0, 0);
+      aDate.setUTCHours(0, 0, 0, 0);
+      bDate.setUTCHours(0, 0, 0, 0);
       return aDate.getTime() == bDate.getTime();
     },
     /**

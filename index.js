@@ -1,15 +1,17 @@
-const minimist = require('minimist');
-const path = require('path');
-const utility = require('./src/utility');
+import minimist from 'minimist';
+import path from 'path';
+import utility from './src/utility.js';
+import dotenv from 'dotenv';
+import autoload from 'auto-load';
 
-module.exports = async () => {
-  require('dotenv').config({ path: path.join(__dirname, '.env') });
+export default async () => {
+  dotenv.config({ path: path.join(import.meta.dirname, '.env') });
 
   // Get the command
   const command = process.argv[2] || '';
 
   // Load route configs and get the current route
-  const routes = require('auto-load')(path.join(__dirname, 'routes')), route = {};
+  const routes = autoload(path.join(import.meta.dirname, 'routes')), route = {};
   const found = Object.entries(routes).find(([id, route]) => route.commands.indexOf(command) !== -1);
 
   // Make sure we have a valid route
@@ -33,7 +35,7 @@ module.exports = async () => {
   }
 
   // Parse arguments again using route-specific options and pass to the relevant controller
-  await require(route.config.controller)(
+  (await import(`${route.config.controller}.js`)).default(
     minimist(
       process.argv.slice(2),
       route.config.args

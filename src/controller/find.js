@@ -1,11 +1,12 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
-const chrono = require('chrono-node');
-const yaml = require('yamljs');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
+import chrono from 'chrono-node';
+import yaml from 'yamljs';
+import inquirerRecursive from 'inquirer-recursive';
 
-inquirer.registerPrompt('recursive', require('inquirer-recursive'));
+inquirer.registerPrompt('recursive', inquirerRecursive);
 
 const searchFields = [
   {
@@ -298,7 +299,7 @@ function convertDateFilters(filters, filterName) {
   return true;
 }
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

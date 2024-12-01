@@ -1,17 +1,17 @@
-const mockRequire = require('mock-require');
-const mockArgv = require('mock-argv');
-const captureConsole = require('capture-console');
-const {
-  config: mockConfig,
-  kanbn: mockKanbn
-} = require('../mock-kanbn');
-const context = require('../context');
+import mockRequire from 'mock-require';
+import mockArgv from 'mock-argv';
+import captureConsole from 'capture-console';
+import {
+  config as mockConfig,
+  kanbn as mockKanbn
+} from '../mock-kanbn.js';
+import context from '../context.js';
 
 let kanbn;
 
 QUnit.module('add task controller tests', {
-  before() {
-    require('../qunit-contains');
+  async before() {
+    import('../qunit-contains');
     mockRequire('../../src/main', mockKanbn);
     kanbn = require('../../index');
   },

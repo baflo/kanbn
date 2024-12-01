@@ -1,8 +1,8 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
-const getGitUsername = require('git-user-name');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
+import getGitUsername from 'git-user-name';
 
 /**
  * Add a comment interactively
@@ -50,7 +50,7 @@ function addComment(taskId, text, author) {
   });
 }
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

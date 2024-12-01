@@ -1,12 +1,12 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const asciichart = require('asciichart');
-const term = require('terminal-kit').terminal;
-const chrono = require('chrono-node');
-const formatDate = require('dateformat');
+import utility from '../utility.js';
+import asciichart from 'asciichart';
+import { terminal as term } from 'terminal-kit';
+import chrono from 'chrono-node';
+import formatDate from 'dateformat';
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

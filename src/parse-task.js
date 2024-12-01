@@ -1,10 +1,10 @@
-const yaml = require('yamljs');
-const fm = require('front-matter');
-const marked = require('marked');
-const utility = require('./utility');
-const chrono = require('chrono-node');
-const validate = require('jsonschema').validate;
-const parseMarkdown = require('./parse-markdown');
+import yaml from 'yamljs';
+import fm from 'front-matter';
+import marked from 'marked';
+import utility from './utility.js';
+import chrono from 'chrono-node';
+import { validate as validate } from 'jsonschema';
+import parseMarkdown from './parse-markdown.js';
 
 /**
  * Compile separate headings together into a task description
@@ -166,7 +166,7 @@ function validateComments(comments) {
   }
 }
 
-module.exports = {
+export default {
 
   /**
    * Convert markdown into a task object

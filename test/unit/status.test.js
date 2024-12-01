@@ -1,7 +1,7 @@
-const mockFileSystem = require('mock-fs');
-const kanbn = require('../../src/main');
-const fixtures = require('../fixtures');
-const mockDate = require('mockdate');
+import mockFileSystem from 'mock-fs';
+import kanbn from '../../src/main.js';
+import fixtures from '../fixtures.js';
+import mockDate from 'mockdate';
 
 QUnit.module('status tests', {
   before() {

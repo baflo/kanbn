@@ -1,7 +1,7 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
 
 /**
  * Remove a task
@@ -19,7 +19,7 @@ function removeTask(taskId, removeFile) {
   });
 }
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

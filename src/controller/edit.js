@@ -1,14 +1,17 @@
-const kanbn_module = require('../main');
+import kanbn_module from '../main.js';
 const kanbn = new kanbn_module.Kanbn();
-const utility = require('../utility');
-const inquirer = require('inquirer');
-const fuzzy = require('fuzzy');
-const chrono = require('chrono-node');
-const getGitUsername = require('git-user-name');
+import utility from '../utility.js';
+import inquirer from 'inquirer';
+import fuzzy from 'fuzzy';
+import chrono from 'chrono-node';
+import getGitUsername from 'git-user-name';
+import inquirerDatepicker from 'inquirer-datepicker';
+import inquirerRecursive from 'inquirer-recursive';
+import inquirerAutocompletePrompt from 'inquirer-autocomplete-prompt';
 
-inquirer.registerPrompt('datepicker', require('inquirer-datepicker'));
-inquirer.registerPrompt('recursive', require('inquirer-recursive'));
-inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+inquirer.registerPrompt('datepicker', inquirerDatepicker);
+inquirer.registerPrompt('recursive', inquirerRecursive);
+inquirer.registerPrompt('autocomplete', inquirerAutocompletePrompt);
 
 /**
  * Update a task interactively
@@ -348,7 +351,7 @@ function updateTask(taskId, taskData, columnName) {
   });
 }
 
-module.exports = async args => {
+export default async args => {
 
   // Make sure kanbn has been initialised
   if (!await kanbn.initialised()) {

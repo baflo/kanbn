@@ -1,4 +1,4 @@
-const utility = require('../../src/utility');
+import utility from '../../src/utility.js';
 
 QUnit.module('utility tests', {
   before() {

@@ -1076,6 +1076,29 @@ class Kanbn {
   }
 
   /**
+   * Add tags of task to list of suggested tags if activated
+   * @param {object} indexData Index data to save
+   * @param {object} taskData The task data
+   */
+  async addTagsToSuggestion(indexData, taskData) {
+    if (!indexData.options.suggestedTags?.saveNewTags) return;
+
+    const currentSuggestedTags = indexData.options.suggestedTags?.tags ?? [];
+    const neverSuggestedTags = indexData.options.suggestedTags?.ignored ?? [];
+    const taskTags = taskData.metadata.tags ?? [];
+    const newSuggestedTags = [...currentSuggestedTags, ...taskTags]
+                                  .filter((curr, index, arr) => arr.indexOf(curr) === index)
+                                  .filter(curr => !neverSuggestedTags.includes(curr))
+                                  .sort();
+
+    indexData.options.suggestedTags = {
+      saveNewTags: !!indexData.options.suggestedTags?.saveNewTags,
+      ignored: neverSuggestedTags,
+      tags: newSuggestedTags,
+    };
+  }
+
+  /**
    * Overwrite a task file with the specified data
    * @param {string} path The task path
    * @param {object} taskData The task data
@@ -1302,6 +1325,9 @@ class Kanbn {
     taskData = updateColumnLinkedCustomFields(index, taskData, columnName);
     await this.saveTask(taskPath, taskData);
 
+    // Update suggested tags
+    this.addTagsToSuggestion(index, taskData);
+
     // Add the task to the index
     index = addTaskToIndex(index, taskId, columnName);
     await this.saveIndex(index);
@@ -1344,6 +1370,9 @@ class Kanbn {
     // Update task metadata dates
     taskData = updateColumnLinkedCustomFields(index, taskData, columnName);
     await this.saveTask(taskPath, taskData);
+
+    // Update suggested tags
+    this.addTagsToSuggestion(index, taskData);
 
     // Add the task to the column and save the index
     index = addTaskToIndex(index, taskId, columnName);
@@ -1437,7 +1466,10 @@ class Kanbn {
     taskData = setTaskMetadata(taskData, "updated", new Date());
 
     // Save task
-    await this.saveTask(getTaskPath(await this.getTaskFolderPath(), taskId), taskData);
+    await this.saveTask(getTaskPath(await this.getTaskFolderPath(), taskId), taskData);    
+
+    // Update suggested tags
+    this.addTagsToSuggestion(index, taskData);
 
     // Move the task if we're updating the column
     if (columnName) {
@@ -1549,6 +1581,9 @@ class Kanbn {
       }
       position = Math.max(Math.min(position, index.columns[currentColumnName].length), 0);
     }
+
+    // Update suggested tags
+    this.addTagsToSuggestion(index, taskData);
 
     // Remove the task from its current column and add it to the new column
     index = removeTaskFromIndex(index, taskId);

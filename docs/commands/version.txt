@@ -1,4 +1,0 @@
-{b}kanbn version{b}
-{b}kanbn v{b}
-
-Show package version.

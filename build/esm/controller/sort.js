@@ -1,0 +1,344 @@
+import kanbn from "../main.js";
+import utility from "../utility.js";
+import inquirer from "inquirer";
+import inquirerRecursive from "inquirer-recursive";
+inquirer.registerPrompt("recursive", inquirerRecursive);
+const sorterFields = [
+  {
+    name: "Id",
+    field: "id",
+    options: [
+      "--id"
+    ],
+    filterable: true
+  },
+  {
+    name: "Name",
+    field: "name",
+    options: [
+      "--name",
+      "-n"
+    ],
+    filterable: true
+  },
+  {
+    name: "Description",
+    field: "description",
+    options: [
+      "--desc",
+      "-d"
+    ],
+    filterable: true
+  },
+  {
+    name: "Sub-tasks",
+    field: "subTasks",
+    options: [
+      "--sub-task",
+      "-s"
+    ],
+    filterable: true
+  },
+  {
+    name: "Count sub-tasks",
+    field: "countSubTasks",
+    options: [
+      "--count-sub-tasks"
+    ],
+    filterable: false
+  },
+  {
+    name: "Tags",
+    field: "tags",
+    options: [
+      "--tag",
+      "-t"
+    ],
+    filterable: true
+  },
+  {
+    name: "Count tags",
+    field: "countTags",
+    options: [
+      "--count-tags"
+    ],
+    filterable: false
+  },
+  {
+    name: "Relations",
+    field: "relations",
+    options: [
+      "--relation",
+      "-r"
+    ],
+    filterable: true
+  },
+  {
+    name: "Count relations",
+    field: "countRelations",
+    options: [
+      "--count-relations"
+    ],
+    filterable: false
+  },
+  {
+    name: "Comments",
+    field: "comments",
+    options: [
+      "--comment"
+    ],
+    filterable: true
+  },
+  {
+    name: "Count comments",
+    field: "countComments",
+    options: [
+      "--count-comments"
+    ],
+    filterable: false
+  },
+  {
+    name: "Created date",
+    field: "created",
+    options: [
+      "--created"
+    ],
+    filterable: false
+  },
+  {
+    name: "Updated date",
+    field: "updated",
+    options: [
+      "--updated"
+    ],
+    filterable: false
+  },
+  {
+    name: "Started date",
+    field: "started",
+    options: [
+      "--started"
+    ],
+    filterable: false
+  },
+  {
+    name: "Completed date",
+    field: "completed",
+    options: [
+      "--completed"
+    ],
+    filterable: false
+  },
+  {
+    name: "Due date",
+    field: "due",
+    options: [
+      "--due"
+    ],
+    filterable: false
+  },
+  {
+    name: "Workload",
+    field: "workload",
+    options: [
+      "--workload",
+      "-w"
+    ],
+    filterable: false
+  },
+  {
+    name: "Progress",
+    field: "progress",
+    options: [
+      "--progress"
+    ],
+    filterable: false
+  },
+  {
+    name: "Assigned user",
+    field: "assigned",
+    options: [
+      "--assigned"
+    ],
+    filterable: true
+  }
+];
+async function interactive(columnName, columnNames, sorters) {
+  const sorterNameToField = Object.fromEntries(sorterFields.map((sorterField) => [sorterField.name, sorterField.field]));
+  return await inquirer.prompt([
+    {
+      type: "rawlist",
+      name: "column",
+      message: "Which column do you want to sort?",
+      default: columnName,
+      choices: columnNames
+    },
+    {
+      type: "recursive",
+      name: "sorters",
+      message: "Sort by another field?",
+      default: true,
+      autoStart: !sorters.length,
+      prompts: [
+        {
+          type: "list",
+          name: "field",
+          message: "Field:",
+          default: "Name",
+          choices: sorterFields.map((sorterField) => sorterField.name),
+          filter: (value, answers) => sorterNameToField[value]
+        },
+        {
+          type: "confirm",
+          name: "addFilter",
+          message: "Filter this field?",
+          default: false,
+          when: (answers) => sorterFields.filter((sorterField) => sorterField.filterable).map((sorterField) => sorterField.field).indexOf(answers.field) !== -1
+        },
+        {
+          type: "input",
+          name: "filter",
+          message: "Filter field:",
+          when: (answers) => answers.addFilter,
+          validate: (value) => {
+            if (!value) {
+              return "Filter cannot be empty";
+            }
+            return true;
+          }
+        },
+        {
+          type: "list",
+          name: "order",
+          message: "Which order?",
+          default: "Ascending",
+          choices: [
+            "Ascending",
+            "Descending"
+          ],
+          filter: (value, answers) => ({
+            "Ascending": "ascending",
+            "Descending": "descending"
+          })[value]
+        }
+      ]
+    }
+  ]);
+}
+function sortColumn(columnName, sorters, save) {
+  kanbn.sort(columnName, sorters, save).then(() => {
+    console.log(`Column "${columnName}" sorted`);
+  }).catch((error) => {
+    utility.error(error);
+  });
+}
+var sort_default = async (args, argv) => {
+  const sortOptions = Object.fromEntries(utility.zip(
+    sorterFields.map((sorterField) => sorterField.options).flat(),
+    sorterFields.map((sorterField) => new Array(sorterField.options.length).fill(sorterField.field)).flat()
+  ));
+  const orderOptions = {
+    "--ascending": "ascending",
+    "-a": "ascending",
+    "--descending": "descending",
+    "-z": "descending"
+  };
+  const skipOptions = [
+    "--interactive",
+    "-i",
+    "--save"
+  ];
+  argv = argv.slice(3);
+  const columnName = args._.length > 1 ? args._[1] : null;
+  if (columnName === null && !args.interactive) {
+    utility.error('No column name specified\nTry running {b}kanbn sort "column"{b} or {b}kanbn sort -i{b}');
+    return;
+  }
+  let index;
+  try {
+    index = await kanbn.getIndex();
+  } catch (error) {
+    utility.error(error);
+    return;
+  }
+  const columnNames = Object.keys(index.columns);
+  if (!columnNames.length) {
+    utility.error('No columns defined in the index\nTry running {b}kanbn init -c "column name"{b}');
+    return;
+  }
+  if ("customFields" in index.options) {
+    for (let customField of index.options.customFields) {
+      sorterFields.push({
+        name: customField.name,
+        field: customField.name,
+        options: [
+          `--${customField.name}`
+        ],
+        filterable: customField.type === "string"
+      });
+    }
+  }
+  if (columnName !== null) {
+    if (columnNames.indexOf(columnName) === -1) {
+      utility.error(`Column "${columnName}" doesn't exist`);
+      return;
+    }
+    argv.shift();
+  }
+  let defaultOrder = "ascending";
+  if (argv[0] in orderOptions) {
+    defaultOrder = orderOptions[argv[0]];
+    argv.shift();
+  }
+  const sorters = [];
+  let currentSorter = null, expectingFilter = false;
+  for (let arg of argv) {
+    if (skipOptions.indexOf(arg) !== -1) {
+      continue;
+    }
+    if (arg in sortOptions) {
+      if (currentSorter !== null) {
+        sorters.push(currentSorter);
+      }
+      currentSorter = {
+        field: sortOptions[arg],
+        filter: "",
+        order: defaultOrder
+      };
+      expectingFilter = true;
+    } else if (currentSorter && currentSorter.field) {
+      if (arg in orderOptions) {
+        currentSorter.order = orderOptions[arg];
+        expectingFilter = false;
+      }
+      if (expectingFilter) {
+        currentSorter.filter = arg;
+        expectingFilter = false;
+      }
+    }
+  }
+  if (currentSorter && currentSorter.field) {
+    sorters.push(currentSorter);
+  }
+  if (args.interactive) {
+    interactive(columnName, columnNames, sorters).then((answers) => {
+      inquirer.prompt({
+        type: "confirm",
+        name: "save",
+        message: "Save sort settings?",
+        default: args.save
+      }).then((saveAnswer) => {
+        sortColumn(answers.column, answers.sorters, saveAnswer.save);
+      }).catch((error) => {
+        utility.error(error);
+      });
+    }).catch((error) => {
+      utility.error(error);
+    });
+  } else {
+    sortColumn(columnName, sorters, args.save);
+  }
+};
+export {
+  sort_default as default
+};

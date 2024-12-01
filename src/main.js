@@ -1023,6 +1023,10 @@ class Kanbn {
    * @param {object} indexData Index data to save
    */
   async saveIndex(indexData) {
+    if (indexData.options.indexVersion === undefined) {
+      indexData.options.indexVersion = 2;
+    }
+
     // Apply column sorting if any sorters are defined in options
     if ("columnSorting" in indexData.options && Object.keys(indexData.options.columnSorting).length) {
       for (let columnName in indexData.options.columnSorting) {
@@ -1043,7 +1047,11 @@ class Kanbn {
     }
 
     // Save index
-    await fs.promises.writeFile(await this.getIndexPath(), parseIndex.json2md(indexData, ignoreOptions));
+    if (indexData.options.indexVersion === 2) {
+      await fs.promises.writeFile(await this.getIndexPath(), parseIndex.json2md_v2(indexData, ignoreOptions));
+    } else {
+      await fs.promises.writeFile(await this.getIndexPath(), parseIndex.json2md(indexData, ignoreOptions));
+    }
   }
 
   /**

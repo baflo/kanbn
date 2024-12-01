@@ -3,8 +3,21 @@
   "version": "0.10.0",
   "description": "A CLI Kanban application",
   "type": "module",
-  "exports": "./index.js",
+  "exports": {
+    ".": {
+      "import": "./build/esm/main.js",
+      "require": "./build/cjs/main.cjs",
+      "types": "./src/main.d.ts"
+    },
+    "./utility": {
+      "import": "./build/esm/utility.js",
+      "require": "./build/cjs/utility.cjs",
+      "types": "./src/utility.d.ts"
+    }
+  },
   "scripts": {
+    "prepublish": "npm run build",
+    "build": "node build.js",
     "test": "KANBN_ENV=test qunit ./test/**/*.test.js"
   },
   "preferGlobal": true,
@@ -56,13 +69,16 @@
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "rimraf": "^3.0.2",
-    "terminal-kit": "^1.44.0",
+    "terminal-kit": "^3.1.1",
     "unified": "^11.0.5",
+    "unist-builder": "^4.0.0",
+    "unist-util-select": "^5.1.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@types/typescript": "^2.0.0",
     "capture-console": "^1.0.1",
+    "esbuild": "^0.24.0",
     "faker": "^5.1.0",
     "mock-argv": "^1.1.10",
     "mock-fs": "^4.13.0",

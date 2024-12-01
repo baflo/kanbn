@@ -7,6 +7,8 @@ import { unified } from 'unified';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
+import { selectAll } from 'unist-util-select';
+import { u } from 'unist-builder';
 
 /**
  * Validate the options object
@@ -272,30 +274,28 @@ export default {
     let name = '', description = '', columns = {};
     try {
       // Parse markdown to an object
-      let index = unified()
+      let indexTree = unified()
         .use(remarkParse)
         .use(remarkGfm)
         .use(remarkStringify)
         .parse(data, { entities: 'escape' });
 
       // Get name and descriptions
-      const headingIndex = index.children.findIndex(child => child.type === "heading" && child.depth === 1);
-      name = index.children[headingIndex].children[0].value;
-      description = index.children[headingIndex + 1].children[0].value;
+      name = selectAll('heading[depth="1"] text', indexTree)?.map(n => n.value).join("\n");
+      description = selectAll('heading[depth="1"] ~ *:not(table) text', indexTree)?.map(n => n.value).join("\n");
 
       validateOptions(options);
 
       // Parse columns
-      const [ headings, ...rows ] = index.children.find(child => child.type === "table").children;
-      const columnNames = headings.children.map(column => column.children[0].value);
+      const [ headings, ...rows ] = selectAll('tableRow', indexTree);
+      const columnNames = selectAll("tableCell text", headings)?.map(cell => cell.value);
       if (columnNames.length) {
         columns = Object.fromEntries(columnNames.map((columnName, columnIndex) => {
           try {
             return [
               columnName,
-              rows.flatMap(r => r.children[columnIndex].children.map(task => task.children[0].value))
+              selectAll(`tableCell:nth-child(${columnIndex + 1}) text`, { children: rows }).map(c => c.value)
             ];
-            
           } catch (error) {
             console.log(error)
             throw new Error(`column "${columnName}" must contain a list`);
@@ -353,38 +353,23 @@ export default {
   json2md_v2(data, ignoreOptions = false) {
     const result = this.initializeIndexFile(data, ignoreOptions);
 
-    const table = {
-      type: "table",
-      children: []
-    }
+    const table = u("table", []);
 
     // Add columns
-    table.children.push({
-      type: "tableRow",
-      children: Object.keys(data.columns).map(value => ({
-        type: "tableCell",
-        children: [{ type: "text", value }]
-      }))
-    })
+    table.children.push(
+      u("tableRow", Object.keys(data.columns).map(value => u("tableCell", [u("text", value )])))
+    )
 
     for (let i = 0; i < Math.max(...Object.values(data.columns).map(c => c.length)); i++) {        
-      table.children.push({
-        type: "tableRow",
-        children: Object.values(data.columns)
+      table.children.push(u(
+        "tableRow",
+        Object.values(data.columns)
           .map(c => c[i] 
-            ? {
-               type: "link",
-               url: `tasks/${c[i]}.md`,
-               children: [{ type: "text", value: c[i] }],
-              }
+            ? u("link", { url: `tasks/${c[i]}.md` }, [u("text", c[i])])
             : undefined
           )
-          .filter(c => c)
-          .map(value => ({
-            type: "tableCell",
-            children: [value]
-          }))
-      })
+          .map(value => u("tableCell", value ? [value] : []))
+      ))
     }
 
     const strigifiedTable = unified()

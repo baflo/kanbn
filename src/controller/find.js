@@ -1,8 +1,7 @@
-import kanbn_module from '../main.js';
-const kanbn = new kanbn_module.Kanbn();
+import kanbn from '../main.js';
 import utility from '../utility.js';
 import inquirer from 'inquirer';
-import chrono from 'chrono-node';
+import * as chrono from 'chrono-node';
 import yaml from 'yamljs';
 import inquirerRecursive from 'inquirer-recursive';
 

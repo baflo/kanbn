@@ -2,4 +2,6 @@ interface UtilityFunctions {
     [k: string]: (...args: any) => any
 }
 
-export default UtilityFunctions;
+declare const utilityFunctions: UtilityFunctions;
+
+export default utilityFunctions;

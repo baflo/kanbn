@@ -1472,7 +1472,7 @@ class Kanbn {
     this.addTagsToSuggestion(index, taskData);
 
     // Move the task if we're updating the column
-    if (columnName) {
+    if (columnName && !index.columns[columnName].includes(taskId)) {
       await this.moveTask(taskId, columnName);
 
       // Otherwise save the index

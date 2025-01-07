@@ -967,7 +967,7 @@ class Kanbn {
     taskData = setTaskMetadata(taskData, "updated", /* @__PURE__ */ new Date());
     await this.saveTask(getTaskPath(await this.getTaskFolderPath(), taskId), taskData);
     this.addTagsToSuggestion(index, taskData);
-    if (columnName) {
+    if (columnName && !index.columns[columnName].includes(taskId)) {
       await this.moveTask(taskId, columnName);
     } else {
       await this.saveIndex(index);
